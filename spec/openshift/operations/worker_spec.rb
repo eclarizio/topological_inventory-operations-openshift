@@ -36,6 +36,7 @@ describe TopologicalInventory::Openshift::Operations::Worker do
     let(:service_plan_url) { URI.join(base_url_path, "service_plans/#{service_plan.id}").to_s }
     let(:source_url) { URI.join(base_url_path, "sources/#{source.id}").to_s }
     let(:service_offering_url) { URI.join(base_url_path, "service_offerings/#{service_offering.id}").to_s }
+    let(:task_url) { URI.join(base_url_path, "tasks/#{task.id}").to_s }
     let(:headers) { {"Content-Type" => "application/json"} }
 
     before do
@@ -51,6 +52,8 @@ describe TopologicalInventory::Openshift::Operations::Worker do
         TopologicalInventory::Openshift::Operations::Core::ServiceCatalogClient
       ).to receive(:new).with(source.id).and_return(service_catalog_client)
       allow(service_catalog_client).to receive(:order_service_plan).and_return({'metadata' => {'selfLink' => 'source_ref'}})
+
+      stub_request(:post, task_url).with(:headers => headers)
     end
 
     it "orders the service via the service catalog client" do
@@ -58,21 +61,15 @@ describe TopologicalInventory::Openshift::Operations::Worker do
       described_class.new.run
     end
 
-    it "updates the task with the status 'completed'" do
-      described_class.new.run
-      task.reload
-      expect(task.status).to eq("completed")
-    end
-
-    it "updates the task with the context from the ordered service plan" do
-      described_class.new.run
-      task.reload
-      expect(task.context).to eq({
-        "service_instance" => {
-          "source_id"  => source.id,
-          "source_ref" => "source_ref"
+    it "posts to the update task endpoint with the status and context" do
+      context = {
+        :service_instance => {
+          :source_id  => source.id,
+          :source_ref => "source_ref"
         }
-      })
+      }
+      expect(a_request(:post, task_url)).with("status" => "completed", "context" => context).to have_been_made
+      described_class.new.run
     end
   end
 end

@@ -64,9 +64,21 @@ module TopologicalInventory
         end
 
         def update_task(task_id, context)
-          #TODO: Change to use API instead of database
-          task = Task.find(task_id)
-          task.update(:status => "completed", :context => context)
+          headers = {
+            "Content-Type" => "application/json"
+          }
+          payload = {
+            "status"  => "completed",
+            "context" => context
+          }
+          request_options = {
+            :method     => :post,
+            :url        => "http://localhost:3000/api/v0.0/tasks/#{task_id}",
+            # :url        => "http://#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_HOST"]}:#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_PORT"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/tasks/#{task_id}"
+            :headers    => headers,
+            :payload    => payload
+          }
+          RestClient::Request.new(request_options).execute
         end
 
         def queue_opts
