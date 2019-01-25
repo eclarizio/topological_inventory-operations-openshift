@@ -11,7 +11,7 @@ module TopologicalInventory
 
       module Logging
         def logger
-          TopologicalInventory::OperationsOpenshift.logger
+          TopologicalInventory::Openshift::Operations.logger
         end
       end
     end
