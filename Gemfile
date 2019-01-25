@@ -7,6 +7,7 @@ gem "topological_inventory-core", :git => "https://github.com/ManageIQ/topologic
 group :development do
   gem "rspec-rails", "~>3.8"
   gem "simplecov"
+  gem "webmock"
 end
 
 #

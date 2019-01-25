@@ -1,5 +1,9 @@
 require "manageiq-messaging"
 require "topological_inventory/openshift/operations/logging"
+require "topological_inventory/openshift/operations/core/service_catalog_client"
+require "topological_inventory/openshift/operations/core/service_offering_retriever"
+require "topological_inventory/openshift/operations/core/service_plan_retriever"
+require "topological_inventory/openshift/operations/core/source_retriever"
 
 module TopologicalInventory
   module Openshift
@@ -34,13 +38,35 @@ module TopologicalInventory
         attr_accessor :messaging_client_opts, :client
 
         def process_message(client, msg)
-          ServicePlan.find(msg.payload[:service_plan_id]).order(msg.payload[:order_params])
-          task = Task.find(msg.payload[:task_id])
-          task.update(:status => "completed")
+          #TODO: Move to separate module later when more message types are expected aside from just ordering
+          context = order_service(msg.payload[:service_plan_id], msg.payload[:order_params])
+          update_task(msg.payload[:task_id], context)
         rescue => e
           logger.error(e.message)
           logger.error(e.backtrace.join("\n"))
           nil
+        end
+
+        def order_service(service_plan_id, order_params)
+          service_plan = Core::ServicePlanRetriever.new(service_plan_id).process
+          source = Core::SourceRetriever.new(service_plan["source_id"]).process
+          service_offering = Core::ServiceOfferingRetriever.new(service_plan["service_offering_id"]).process
+
+          catalog_client = Core::ServiceCatalogClient.new(source["id"])
+          parsed_response = catalog_client.order_service_plan(service_plan["name"], service_offering["name"], order_params)
+
+          {
+            :service_instance => {
+              :source_id  => source["id"],
+              :source_ref => parsed_response['metadata']['selfLink']
+            }
+          }
+        end
+
+        def update_task(task_id, context)
+          #TODO: Change to use API instead of database
+          task = Task.find(task_id)
+          task.update(:status => "completed", :context => context)
         end
 
         def queue_opts
