@@ -1,6 +1,6 @@
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         class ServicePlanClient
           def build_payload(service_plan_name, service_offering_name, order_parameters)

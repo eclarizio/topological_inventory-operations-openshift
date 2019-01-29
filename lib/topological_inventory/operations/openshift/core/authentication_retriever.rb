@@ -1,6 +1,6 @@
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         class AuthenticationRetriever
           def initialize(endpoint_id)

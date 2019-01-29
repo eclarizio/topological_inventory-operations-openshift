@@ -1,8 +1,8 @@
-require "topological_inventory/openshift/operations/core/retriever"
+require "topological_inventory/operations/openshift/core/retriever"
 
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         class ServicePlanRetriever < Retriever
           private

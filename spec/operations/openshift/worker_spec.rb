@@ -1,6 +1,6 @@
-require "topological_inventory/openshift/operations/worker"
+require "topological_inventory/operations/openshift/worker"
 
-describe TopologicalInventory::Openshift::Operations::Worker do
+describe TopologicalInventory::Operations::Openshift::Worker do
   let(:client) { double(:client) }
 
   describe "#run" do
@@ -47,9 +47,10 @@ describe TopologicalInventory::Openshift::Operations::Worker do
       stub_request(:get, service_plan_url).with(:headers => headers).to_return(:body => service_plan.to_json)
       stub_request(:get, source_url).with(:headers => headers).to_return(:body => source.to_json)
       stub_request(:get, service_offering_url).with(:headers => headers).to_return(:body => service_offering.to_json)
+      stub_request(:post, task_url)
 
       allow(
-        TopologicalInventory::Openshift::Operations::Core::ServiceCatalogClient
+        TopologicalInventory::Operations::Openshift::Core::ServiceCatalogClient
       ).to receive(:new).with(source.id).and_return(service_catalog_client)
       allow(service_catalog_client).to receive(:order_service_plan).and_return({'metadata' => {'selfLink' => 'source_ref'}})
 
@@ -68,8 +69,10 @@ describe TopologicalInventory::Openshift::Operations::Worker do
           :source_ref => "source_ref"
         }
       }
-      expect(a_request(:post, task_url)).with("status" => "completed", "context" => context).to have_been_made
       described_class.new.run
+      expect(
+        a_request(:post, task_url).with(:body => {"status" => "completed", "context" => context})
+      ).to have_been_made
     end
   end
 end

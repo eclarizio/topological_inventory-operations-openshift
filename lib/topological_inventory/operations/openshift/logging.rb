@@ -1,6 +1,6 @@
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       class << self
         attr_writer :logger
       end
@@ -11,7 +11,7 @@ module TopologicalInventory
 
       module Logging
         def logger
-          TopologicalInventory::Openshift::Operations.logger
+          TopologicalInventory::Operations::Openshift.logger
         end
       end
     end
