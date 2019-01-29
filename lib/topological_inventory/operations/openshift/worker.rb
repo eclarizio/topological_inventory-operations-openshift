@@ -83,7 +83,7 @@ module TopologicalInventory
 
         def queue_opts
           {
-            :service => "platform.topological-inventory.openshift-operations",
+            :service => "platform.topological-inventory.operations-openshift",
           }
         end
 
