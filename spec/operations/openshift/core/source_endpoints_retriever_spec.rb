@@ -17,7 +17,7 @@ module TopologicalInventory
             end
 
             it "returns the service plan response" do
-              expect(subject.process).to eq(dummy_response.to_json)
+              expect(subject.process).to eq(dummy_response)
             end
           end
         end
