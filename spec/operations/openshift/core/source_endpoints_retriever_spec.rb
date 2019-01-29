@@ -1,8 +1,8 @@
-require "topological_inventory/openshift/operations/core/source_endpoints_retriever"
+require "topological_inventory/operations/openshift/core/source_endpoints_retriever"
 
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         describe SourceEndpointsRetriever do
           let(:subject) { described_class.new(123) }

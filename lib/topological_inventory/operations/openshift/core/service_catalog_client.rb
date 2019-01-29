@@ -1,11 +1,11 @@
 require "rest_client"
-require "topological_inventory/openshift/operations/core/authentication_retriever"
-require "topological_inventory/openshift/operations/core/service_plan_client"
-require "topological_inventory/openshift/operations/core/source_endpoints_retriever"
+require "topological_inventory/operations/openshift/core/authentication_retriever"
+require "topological_inventory/operations/openshift/core/service_plan_client"
+require "topological_inventory/operations/openshift/core/source_endpoints_retriever"
 
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         class ServiceCatalogClient
           def initialize(source_id)

@@ -1,13 +1,13 @@
 require "manageiq-messaging"
-require "topological_inventory/openshift/operations/logging"
-require "topological_inventory/openshift/operations/core/service_catalog_client"
-require "topological_inventory/openshift/operations/core/service_offering_retriever"
-require "topological_inventory/openshift/operations/core/service_plan_retriever"
-require "topological_inventory/openshift/operations/core/source_retriever"
+require "topological_inventory/operations/openshift/logging"
+require "topological_inventory/operations/openshift/core/service_catalog_client"
+require "topological_inventory/operations/openshift/core/service_offering_retriever"
+require "topological_inventory/operations/openshift/core/service_plan_retriever"
+require "topological_inventory/operations/openshift/core/source_retriever"
 
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       class Worker
         include Logging
 

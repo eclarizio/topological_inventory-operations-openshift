@@ -1,8 +1,8 @@
-require "topological_inventory/openshift/operations/core/service_plan_retriever"
+require "topological_inventory/operations/openshift/core/service_plan_retriever"
 
 module TopologicalInventory
-  module Openshift
-    module Operations
+  module Operations
+    module Openshift
       module Core
         describe ServicePlanRetriever do
           let(:subject) { described_class.new(123) }

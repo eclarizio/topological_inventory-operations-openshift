@@ -1,6 +1,6 @@
-require "topological_inventory/openshift/operations/worker"
+require "topological_inventory/operations/openshift/worker"
 
-describe TopologicalInventory::Openshift::Operations::Worker do
+describe TopologicalInventory::Operations::Openshift::Worker do
   let(:client) { double(:client) }
 
   describe "#run" do
@@ -49,7 +49,7 @@ describe TopologicalInventory::Openshift::Operations::Worker do
       stub_request(:get, service_offering_url).with(:headers => headers).to_return(:body => service_offering.to_json)
 
       allow(
-        TopologicalInventory::Openshift::Operations::Core::ServiceCatalogClient
+        TopologicalInventory::Operations::Openshift::Core::ServiceCatalogClient
       ).to receive(:new).with(source.id).and_return(service_catalog_client)
       allow(service_catalog_client).to receive(:order_service_plan).and_return({'metadata' => {'selfLink' => 'source_ref'}})
 
