@@ -9,6 +9,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
     let(:tenant) { Tenant.create! }
     let(:service_plan) do
       ServicePlan.create!(:source           => source,
+                          :source_ref      => SecureRandom.uuid,
                           :tenant           => tenant,
                           :name             => "plan_name",
                           :service_offering => service_offering)
@@ -20,10 +21,11 @@ describe TopologicalInventory::Operations::Openshift::Worker do
                      :name        => "source",
                      :source_type => source_type)
     end
-    let(:source_region) { SourceRegion.create!(:tenant => tenant, :source => source) }
-    let(:subscription) { Subscription.create!(:tenant => tenant, :source => source) }
+    let(:source_region) { SourceRegion.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
+    let(:subscription) { Subscription.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
     let(:service_offering) do
       ServiceOffering.create!(:source        => source,
+                              :source_ref    => SecureRandom.uuid,
                               :tenant        => tenant,
                               :source_region => source_region,
                               :subscription  => subscription,
