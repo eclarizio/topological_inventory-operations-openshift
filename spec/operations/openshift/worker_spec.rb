@@ -9,6 +9,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
     let(:tenant) { Tenant.create! }
     let(:service_plan) do
       ServicePlan.create!(:source           => source,
+                          :source_ref      => SecureRandom.uuid,
                           :tenant           => tenant,
                           :name             => "plan_name",
                           :service_offering => service_offering)
@@ -20,10 +21,11 @@ describe TopologicalInventory::Operations::Openshift::Worker do
                      :name        => "source",
                      :source_type => source_type)
     end
-    let(:source_region) { SourceRegion.create!(:tenant => tenant, :source => source) }
-    let(:subscription) { Subscription.create!(:tenant => tenant, :source => source) }
+    let(:source_region) { SourceRegion.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
+    let(:subscription) { Subscription.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
     let(:service_offering) do
       ServiceOffering.create!(:source        => source,
+                              :source_ref    => SecureRandom.uuid,
                               :tenant        => tenant,
                               :source_region => source_region,
                               :subscription  => subscription,
@@ -32,7 +34,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
     let(:payload) { {:service_plan_id => service_plan.id, :order_params => "order_params", :task_id => task.id} }
 
     let(:service_catalog_client) { instance_double("ServiceCatalogClient") }
-    let(:base_url_path) { "http://localhost:3000/api/v0.0/" }
+    let(:base_url_path) { "http://localhost:3000/api/topological-inventory/v0.0/" }
     let(:service_plan_url) { URI.join(base_url_path, "service_plans/#{service_plan.id}").to_s }
     let(:source_url) { URI.join(base_url_path, "sources/#{source.id}").to_s }
     let(:service_offering_url) { URI.join(base_url_path, "service_offerings/#{service_offering.id}").to_s }
@@ -55,6 +57,19 @@ describe TopologicalInventory::Operations::Openshift::Worker do
       allow(service_catalog_client).to receive(:order_service_plan).and_return({'metadata' => {'selfLink' => 'source_ref'}})
 
       stub_request(:post, task_url).with(:headers => headers)
+    end
+
+    around do |e|
+      url    = ENV["TOPOLOGICAL_INVENTORY_URL"]
+      prefix = ENV["PATH_PREFIX"]
+
+      ENV["TOPOLOGICAL_INVENTORY_URL"] = "http://localhost:3000"
+      ENV["PATH_PREFIX"]               = "api"
+
+      e.run
+
+      ENV["TOPOLOGICAL_INVENTORY_URL"] = url
+      ENV["PATH_PREFIX"]               = prefix
     end
 
     it "orders the service via the service catalog client" do

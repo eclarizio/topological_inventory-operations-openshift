@@ -73,8 +73,7 @@ module TopologicalInventory
           }
           request_options = {
             :method     => :post,
-            :url        => "http://localhost:3000/api/v0.0/tasks/#{task_id}",
-            # :url        => "http://#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_HOST"]}:#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_PORT"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/tasks/#{task_id}"
+            :url        => "#{ENV["TOPOLOGICAL_INVENTORY_URL"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/tasks/#{task_id}",
             :headers    => headers,
             :payload    => payload
           }
