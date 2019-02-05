@@ -26,7 +26,7 @@ module TopologicalInventory
           end
 
           def base_url
-            "http://#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_HOST"]}:#{ENV["TOPOLOGICAL_INVENTORY_API_SERVICE_PORT"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/"
+            "#{ENV["TOPOLOGICAL_INVENTORY_URL"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/"
           end
 
           def url_path
