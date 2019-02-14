@@ -5,10 +5,8 @@ module TopologicalInventory
     module Openshift
       module Core
         class SourceRetriever < Retriever
-          private
-
-          def url_path
-            "sources/#{@id}"
+          def process
+            @api_instance.show_source(@id.to_s)
           end
         end
       end

@@ -10,9 +10,9 @@ module TopologicalInventory
         class ServiceCatalogClient
           def initialize(source_id)
             all_source_endpoints = SourceEndpointsRetriever.new(source_id).process
-            @default_endpoint = all_source_endpoints.find { |endpoint| endpoint["default"] }
+            @default_endpoint = all_source_endpoints.data.find { |endpoint| endpoint.default }
 
-            @authentication = AuthenticationRetriever.new(@default_endpoint["id"]).process
+            @authentication = AuthenticationRetriever.new(@default_endpoint.id).process
           end
 
           def order_service_plan(plan_name, service_offering_name, additional_parameters)
@@ -25,10 +25,10 @@ module TopologicalInventory
 
           def order_service_plan_url
             base_url_path = URI::Generic.build(
-              :scheme => @default_endpoint["scheme"],
-              :host   => @default_endpoint["host"],
-              :port   => @default_endpoint["port"],
-              :path   => @default_endpoint["path"]
+              :scheme => @default_endpoint.scheme,
+              :host   => @default_endpoint.host,
+              :port   => @default_endpoint.port,
+              :path   => @default_endpoint.path
             ).to_s
             URI.join(base_url_path, "apis/servicecatalog.k8s.io/v1beta1/namespaces/default/serviceinstances").to_s
           end
@@ -54,7 +54,7 @@ module TopologicalInventory
           end
 
           def verify_ssl_mode
-            @default_endpoint["verify_ssl"] ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
+            @default_endpoint.verify_ssl ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
           end
         end
       end

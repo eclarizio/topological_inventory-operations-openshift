@@ -5,10 +5,8 @@ module TopologicalInventory
     module Openshift
       module Core
         class ServicePlanRetriever < Retriever
-          private
-
-          def url_path
-            "service_plans/#{@id}"
+          def process
+            @api_instance.show_service_plan(@id.to_s)
           end
         end
       end

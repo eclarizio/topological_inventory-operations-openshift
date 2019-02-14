@@ -10,10 +10,10 @@ module TopologicalInventory
           describe "#process" do
             let(:url) { "http://localhost:3000/api/topological-inventory/v0.0/sources/123/endpoints" }
             let(:headers) { {"Content-Type" => "application/json"} }
-            let(:dummy_response) { {"dummy" => "response"} }
+            let(:dummy_response) { {"data" => [{"host" => "dummy"}]} }
 
             before do
-              stub_request(:get, url).with(:headers => headers).to_return(:body => dummy_response.to_json)
+              stub_request(:get, url).with(:headers => headers).to_return(:body => dummy_response.to_json, :headers => headers)
             end
 
             around do |e|
@@ -29,8 +29,11 @@ module TopologicalInventory
               ENV["PATH_PREFIX"]               = prefix
             end
 
-            it "returns the service plan response" do
-              expect(subject.process).to eq(dummy_response)
+            it "returns the list of endpoints based on the source" do
+              endpoints = subject.process
+              expect(endpoints.class).to eq(TopologicalInventoryApiClient::EndpointsCollection)
+              expect(endpoints.data.first.class).to eq(TopologicalInventoryApiClient::Endpoint)
+              expect(endpoints.data.first.host).to eq("dummy")
             end
           end
         end
