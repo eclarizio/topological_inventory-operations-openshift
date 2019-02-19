@@ -1,4 +1,5 @@
 require "topological_inventory/operations/openshift/worker"
+require "topological_inventory-api-client"
 
 describe TopologicalInventory::Operations::Openshift::Worker do
   let(:client) { double(:client) }
@@ -7,29 +8,18 @@ describe TopologicalInventory::Operations::Openshift::Worker do
     let(:messages) { [ManageIQ::Messaging::ReceivedMessage.new(nil, nil, payload, nil)] }
     let(:task) { Task.create!(:tenant => tenant) }
     let(:tenant) { Tenant.create! }
+
     let(:service_plan) do
-      ServicePlan.create!(:source           => source,
-                          :source_ref      => SecureRandom.uuid,
-                          :tenant           => tenant,
-                          :name             => "plan_name",
-                          :service_offering => service_offering)
+      TopologicalInventoryApiClient::ServicePlan.new(:id                  => "123",
+                                                     :name                => "plan_name",
+                                                     :source_id           => source.id,
+                                                     :service_offering_id => service_offering.id)
     end
-    let(:source_type) { SourceType.create!(:name => "test", :product_name => "test", :vendor => "test") }
     let(:source) do
-      Source.create!(:tenant      => tenant,
-                     :uid         => SecureRandom.uuid,
-                     :name        => "source",
-                     :source_type => source_type)
+      TopologicalInventoryApiClient::Source.new(:id => "321")
     end
-    let(:source_region) { SourceRegion.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
-    let(:subscription) { Subscription.create!(:tenant => tenant, :source => source, :source_ref => SecureRandom.uuid) }
     let(:service_offering) do
-      ServiceOffering.create!(:source        => source,
-                              :source_ref    => SecureRandom.uuid,
-                              :tenant        => tenant,
-                              :source_region => source_region,
-                              :subscription  => subscription,
-                              :name          => "service_offering")
+      TopologicalInventoryApiClient::ServiceOffering.new(:id => "456", :name => "service_offering")
     end
     let(:payload) { {:service_plan_id => service_plan.id, :order_params => "order_params", :task_id => task.id} }
 
@@ -46,10 +36,15 @@ describe TopologicalInventory::Operations::Openshift::Worker do
       allow(client).to receive(:close)
       allow(client).to receive(:subscribe_messages).and_yield(messages)
 
-      stub_request(:get, service_plan_url).with(:headers => headers).to_return(:body => service_plan.to_json)
-      stub_request(:get, source_url).with(:headers => headers).to_return(:body => source.to_json)
-      stub_request(:get, service_offering_url).with(:headers => headers).to_return(:body => service_offering.to_json)
-      stub_request(:post, task_url)
+      stub_request(:get, service_plan_url).with(:headers => headers).to_return(
+        :headers => headers, :body => service_plan.to_json
+      )
+      stub_request(:get, source_url).with(:headers => headers).to_return(
+        :headers => headers, :body => source.to_json
+      )
+      stub_request(:get, service_offering_url).with(:headers => headers).to_return(
+        :headers => headers, :body => service_offering.to_json
+      )
 
       allow(
         TopologicalInventory::Operations::Openshift::Core::ServiceCatalogClient

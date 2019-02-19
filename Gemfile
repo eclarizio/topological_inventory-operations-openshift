@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem "manageiq-messaging", '~> 0.1.2'
 
 gem "topological_inventory-core", :git => "https://github.com/ManageIQ/topological_inventory-core", :branch => "master"
+gem 'topological_inventory-api-client', :git => "https://github.com/eclarizio/topological_inventory-api-client", :branch => "master"
 
 group :development do
   gem "rspec-rails", "~>3.8"

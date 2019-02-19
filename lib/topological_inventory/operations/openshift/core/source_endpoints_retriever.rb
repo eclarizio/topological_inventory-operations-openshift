@@ -5,10 +5,8 @@ module TopologicalInventory
     module Openshift
       module Core
         class SourceEndpointsRetriever < Retriever
-          private
-
-          def url_path
-            "sources/#{@id}/endpoints"
+          def process
+            @api_instance.list_source_endpoints(@id.to_s)
           end
         end
       end

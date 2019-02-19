@@ -10,10 +10,10 @@ module TopologicalInventory
           describe "#process" do
             let(:url) { "http://localhost:3000/api/topological-inventory/v0.0/sources/123" }
             let(:headers) { {"Content-Type" => "application/json"} }
-            let(:dummy_response) { {"dummy" => "response"} }
+            let(:dummy_response) { {"name" => "dummy"} }
 
             before do
-              stub_request(:get, url).with(:headers => headers).to_return(:body => dummy_response.to_json)
+              stub_request(:get, url).with(:headers => headers).to_return(:body => dummy_response.to_json, :headers => headers)
             end
 
             around do |e|
@@ -30,7 +30,9 @@ module TopologicalInventory
             end
 
             it "returns the source response" do
-              expect(subject.process).to eq(dummy_response)
+              source = subject.process
+              expect(source.class).to eq(TopologicalInventoryApiClient::Source)
+              expect(source.name).to eq("dummy")
             end
           end
         end

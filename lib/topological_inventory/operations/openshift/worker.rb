@@ -49,15 +49,15 @@ module TopologicalInventory
 
         def order_service(service_plan_id, order_params)
           service_plan = Core::ServicePlanRetriever.new(service_plan_id).process
-          source = Core::SourceRetriever.new(service_plan["source_id"]).process
-          service_offering = Core::ServiceOfferingRetriever.new(service_plan["service_offering_id"]).process
+          source = Core::SourceRetriever.new(service_plan.source_id).process
+          service_offering = Core::ServiceOfferingRetriever.new(service_plan.service_offering_id).process
 
-          catalog_client = Core::ServiceCatalogClient.new(source["id"])
-          parsed_response = catalog_client.order_service_plan(service_plan["name"], service_offering["name"], order_params)
+          catalog_client = Core::ServiceCatalogClient.new(source.id)
+          parsed_response = catalog_client.order_service_plan(service_plan.name, service_offering.name, order_params)
 
           {
             :service_instance => {
-              :source_id  => source["id"],
+              :source_id  => source.id,
               :source_ref => parsed_response['metadata']['selfLink']
             }
           }
@@ -70,7 +70,7 @@ module TopologicalInventory
           payload = {
             "status"  => "completed",
             "context" => context
-          }
+          }.to_json
           request_options = {
             :method     => :post,
             :url        => "#{ENV["TOPOLOGICAL_INVENTORY_URL"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/tasks/#{task_id}",
