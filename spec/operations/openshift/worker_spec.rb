@@ -1,5 +1,4 @@
 require "topological_inventory/operations/openshift/worker"
-require "topological_inventory-api-client"
 
 describe TopologicalInventory::Operations::Openshift::Worker do
   let(:client) { double(:client) }
@@ -51,7 +50,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
       ).to receive(:new).with(source.id).and_return(service_catalog_client)
       allow(service_catalog_client).to receive(:order_service_plan).and_return({'metadata' => {'selfLink' => 'source_ref'}})
 
-      stub_request(:post, task_url).with(:headers => headers)
+      stub_request(:patch, task_url).with(:headers => headers)
     end
 
     around do |e|
@@ -72,7 +71,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
       described_class.new.run
     end
 
-    it "posts to the update task endpoint with the status and context" do
+    it "makes a patch request to the update task endpoint with the status and context" do
       context = {
         :service_instance => {
           :source_id  => source.id,
@@ -81,7 +80,7 @@ describe TopologicalInventory::Operations::Openshift::Worker do
       }
       described_class.new.run
       expect(
-        a_request(:post, task_url).with(:body => {"status" => "completed", "context" => context})
+        a_request(:patch, task_url).with(:body => {"status" => "completed", "context" => context})
       ).to have_been_made
     end
   end

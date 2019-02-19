@@ -4,6 +4,7 @@ require "topological_inventory/operations/openshift/core/service_catalog_client"
 require "topological_inventory/operations/openshift/core/service_offering_retriever"
 require "topological_inventory/operations/openshift/core/service_plan_retriever"
 require "topological_inventory/operations/openshift/core/source_retriever"
+require "topological_inventory-api-client"
 
 module TopologicalInventory
   module Operations
@@ -40,7 +41,7 @@ module TopologicalInventory
         def process_message(client, msg)
           #TODO: Move to separate module later when more message types are expected aside from just ordering
           context = order_service(msg.payload[:service_plan_id], msg.payload[:order_params])
-          update_task(msg.payload[:task_id], context)
+          update_task(msg.payload[:task_id].to_s, context)
         rescue => e
           logger.error(e.message)
           logger.error(e.backtrace.join("\n"))
@@ -64,20 +65,9 @@ module TopologicalInventory
         end
 
         def update_task(task_id, context)
-          headers = {
-            "Content-Type" => "application/json"
-          }
-          payload = {
-            "status"  => "completed",
-            "context" => context
-          }.to_json
-          request_options = {
-            :method     => :post,
-            :url        => "#{ENV["TOPOLOGICAL_INVENTORY_URL"]}/#{ENV["PATH_PREFIX"]}/topological-inventory/v0.0/tasks/#{task_id}",
-            :headers    => headers,
-            :payload    => payload
-          }
-          RestClient::Request.new(request_options).execute
+          api_instance = TopologicalInventoryApiClient::DefaultApi.new
+          task = TopologicalInventoryApiClient::Task.new("status" => "completed", "context" => context)
+          api_instance.update_task(task_id, task)
         end
 
         def queue_opts
